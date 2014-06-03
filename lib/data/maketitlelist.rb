@@ -4,9 +4,11 @@ DATA.select{ |r| r.match(/\w/) }.each do |r|
     titles << r.strip 
 end
 File.open('titles.yaml', 'w') do |f|
-    YAML.dump(titles, f)
+    YAML.dump(titles.reverse, f)
 end
 
+# In data section list titles from less specific to more
+# specific, i.e. first "Dr."  and then "Dr. med.".
 __END__
 Dr.
 Dr.med.

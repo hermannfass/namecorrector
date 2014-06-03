@@ -4,11 +4,13 @@ prepositions = []
 DATA.select{ |r| r.match(/\w/) }.each do |r|
     prepositions << r.strip 
 end
-pp prepositions
 File.open('prepositions.yaml', 'w') do |f|
-    YAML.dump(prepositions, f)
+    YAML.dump(prepositions.reverse, f)
 end
 
+# Order of prepositions in data section:
+# Where values intersect start with the longer one, e.g.
+# put "von den" after "von".
 __END__
 von
 von den
