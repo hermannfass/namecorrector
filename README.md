@@ -29,6 +29,12 @@ be able to guess where all the names in the world should have upper case
 letters and where they should have lower case characters. It is not possible
 to revert data quality ignorance afterwards.
 
+## Requirements
+
+Requires the 'stringextension' Gem.
+Get it from the 'pkg' subfolder of:
+https://github.com/hermannfass/stringextension/
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -45,7 +51,11 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    require 'namecorrector'
+    nc = NameCorrector.new
+    name = 'DR. Med. ährmann-mccormick VOM Faß'
+    puts nc.make_proper_case(name)
+    # Result: Dr. med. Ährmann-McCormick vom Faß
 
 ## Contributing
 

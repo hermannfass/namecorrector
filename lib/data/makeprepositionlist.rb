@@ -12,10 +12,13 @@ end
 # Where values intersect start with the longer one, e.g.
 # put "von den" after "von".
 __END__
+vom
 von
 von den
 zu
 van
 van den
-
+de
+de la
+du
 

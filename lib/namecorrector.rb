@@ -2,6 +2,7 @@
 
 require 'pp'
 require 'yaml'
+require 'stringextension'
 
 class NameCorrector
 
@@ -34,49 +35,63 @@ class NameCorrector
         File.open( File.join(DataDir, 'irregular_surnames.yaml') ) do |f|
             @irregular_surnames = YAML.load( f )
         end
+        File.open( File.join(DataDir, 'word_separators.yaml') ) do |f|
+            @word_separators = YAML.load( f )
+        end
         title_pattern = @titles.join('|')
         preposition_pattern = @prepositions.join('|')
-        other_pattern= '[-\w]+'
+        separator_pattern = @word_separators.join('|')
+        other_pattern= '(?:[[:word:]]+)'
         @split_regexp = Regexp.new(
             '(?:' +
-            [title_pattern, preposition_pattern, other_pattern].join('|') +
-            ')+', 
-            Regexp::IGNORECASE )
-    end
-
-    # Capitalize every word of a string, treating the part
-    # after a hyphen as a new word.
-    #--
-    # To do: 
-    # Change regular expressinos to POSIX or find other way to handle
-    # Umlaut, accents, and perhaps other non-ASCII letters correctly.
-    # Perhaps the upcase method for String should go to 
-    # stringextension.rb or so.
-    #++
-    def capitalize_name(n)
-        corrected_name = ''
-        n.scan(/\w+[ -]?/).each { |p| corrected_name << p.capitalize } 
-        corrected_name
+            [title_pattern, preposition_pattern,
+             separator_pattern, other_pattern].join('|') +
+            ')', 
+            Regexp::IGNORECASE
+        )
     end
 
     # Change the uppercase and lowercase usage in a name according to
     # the typical conventions in German, English, and some other European
     # languages. However, character sets beyond ASCII are not handled
     # properly in the current version. 
+    #--
+    # To do: Refactor to match the DRY paradigm.
+    #++
     def make_proper_case(n)
         corrected_parts = []
         parts = n.scan( @split_regexp )
+        done = false
         parts.each do |p|
-            if ( @prepositions.include?(p) )
-                corrected_parts << p
-            else 
-                corrected_parts << ( irregular_surnames[p] || self.capitalize_name(p) )
+            done = false
+            @prepositions.each do |prep|
+                if prep.downcase == p.downcase
+                    corrected_parts << prep
+                    done = true
+                end
             end
+            next if done
+            @irregular_surnames.each do |isur_k, isur_v|
+                if isur_k.downcase == p.downcase
+                    corrected_parts << isur_v
+                    done = true
+                end
+            end
+            next if done
+            if @word_separators.include?(p)
+                corrected_parts << p
+                done = true
+            end
+            next if done
+            # It was none of the above, so a normal word => just add it.
+            corrected_parts << p.unicode_capitalize
         end
-        corrected_parts.join(' ')
+        corrected_parts.join('')
     end
 
 end
 
-sn = 'Hermann-ANdreAS von den dipasquale-Migräne'
-puts NameCorrector.new.make_proper_case(sn)
+    nc = NameCorrector.new
+    name = 'DR. Med. ährmann-mccormick VOM Faß'
+    puts nc.make_proper_case(name)
+
