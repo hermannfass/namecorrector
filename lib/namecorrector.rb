@@ -91,7 +91,7 @@ class NameCorrector
 
 end
 
-    nc = NameCorrector.new
-    name = 'DR. Med. ährmann-mccormick VOM Faß'
-    puts nc.make_proper_case(name)
+#nc = NameCorrector.new
+#name = 'DR. Med. ährmann-mccormick VOM Faß'
+#puts nc.make_proper_case(name)
 
